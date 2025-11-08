@@ -164,27 +164,26 @@ const FirebaseConfig = {
         if (!this.currentUser) return;
 
         try {
-            // Get journal entries
-            const entries = await this.getFromCloud('journal/entries');
-            if (entries) {
-                localStorage.setItem('journal_entries', JSON.stringify(entries));
-                console.log('✅ Synced journal entries from cloud');
+            // Get papers
+            const papers = await this.getFromCloud('papers');
+            if (papers) {
+                localStorage.setItem('papers', JSON.stringify(papers));
+                console.log('✅ Synced papers from cloud');
             }
 
-            // Get projects
-            const projects = await this.getFromCloud('projects/projects');
-            if (projects) {
-                localStorage.setItem('projects', JSON.stringify(projects));
-                console.log('✅ Synced projects from cloud');
+            // Get folders
+            const folders = await this.getFromCloud('folders');
+            if (folders) {
+                localStorage.setItem('folders', JSON.stringify(folders));
+                console.log('✅ Synced folders from cloud');
             }
 
             // Refresh UI
-            if (window.Journal) window.Journal.updateStats();
-            if (window.Projects) {
-                window.Projects.updateStats();
-                window.Projects.loadProjects();
+            if (window.Papers) window.Papers.render();
+            if (window.Folders) {
+                window.Folders.render();
+                window.Folders.updateCounts();
             }
-            if (window.Calendar) window.Calendar.update();
 
         } catch (error) {
             console.error('❌ Sync error:', error);
@@ -197,16 +196,16 @@ const FirebaseConfig = {
         console.log('🔄 Migrating local data to cloud...');
 
         try {
-            // Migrate journal entries
-            const entries = localStorage.getItem('journal_entries');
-            if (entries) {
-                await this.saveToCloud('journal/entries', JSON.parse(entries));
+            // Migrate papers
+            const papers = localStorage.getItem('papers');
+            if (papers) {
+                await this.saveToCloud('papers', JSON.parse(papers));
             }
 
-            // Migrate projects
-            const projects = localStorage.getItem('projects');
-            if (projects) {
-                await this.saveToCloud('projects/projects', JSON.parse(projects));
+            // Migrate folders
+            const folders = localStorage.getItem('folders');
+            if (folders) {
+                await this.saveToCloud('folders', JSON.parse(folders));
             }
 
             console.log('✅ Local data migrated to cloud');
