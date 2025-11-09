@@ -75,7 +75,7 @@
         <header class="header">
             <div class="header-content">
                 <div class="header-left">
-                    <h1>📚 Research Papers</h1>
+                    <h1>Research Papers</h1>
                     <span class="user-email" id="user-email"></span>
                 </div>
                 <div class="header-right">
@@ -109,18 +109,18 @@
                         <label class="filter-label">Priority:</label>
                         <div class="filter-options">
                             <button class="filter-btn active" data-filter-type="priority" data-filter-value="All">All</button>
-                            <button class="filter-btn" data-filter-type="priority" data-filter-value="P1">🔴 P1</button>
-                            <button class="filter-btn" data-filter-type="priority" data-filter-value="P2">🟡 P2</button>
-                            <button class="filter-btn" data-filter-type="priority" data-filter-value="P3">🟢 P3</button>
+                            <button class="filter-btn" data-filter-type="priority" data-filter-value="P1">P1</button>
+                            <button class="filter-btn" data-filter-type="priority" data-filter-value="P2">P2</button>
+                            <button class="filter-btn" data-filter-type="priority" data-filter-value="P3">P3</button>
                         </div>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Status:</label>
                         <div class="filter-options">
                             <button class="filter-btn active" data-filter-type="status" data-filter-value="All">All</button>
-                            <button class="filter-btn" data-filter-type="status" data-filter-value="To Read">📚 To Read</button>
-                            <button class="filter-btn" data-filter-type="status" data-filter-value="Reading">📖 Reading</button>
-                            <button class="filter-btn" data-filter-type="status" data-filter-value="Read">✅ Read</button>
+                            <button class="filter-btn" data-filter-type="status" data-filter-value="To Read">To Read</button>
+                            <button class="filter-btn" data-filter-type="status" data-filter-value="Reading">Reading</button>
+                            <button class="filter-btn" data-filter-type="status" data-filter-value="Read">Read</button>
                         </div>
                     </div>
                 </div>
@@ -132,7 +132,12 @@
                     <h2 id="current-folder-title">All Papers</h2>
                     <div class="main-actions">
                         <input type="text" class="search-box" id="search-papers" placeholder="Search papers...">
-                        <button class="btn btn-secondary" id="semantic-scholar-search-btn">🔍 Search Semantic Scholar</button>
+                        <button class="btn btn-secondary" id="semantic-scholar-search-btn">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                            Search Semantic Scholar
+                        </button>
                         <button class="btn btn-primary" id="new-paper-btn">+ New Paper</button>
                     </div>
                 </div>
