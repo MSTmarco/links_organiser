@@ -45,10 +45,18 @@ const FirebaseConfig = {
                 if (user) {
                     console.log('✅ User logged in:', user.email);
                     this.syncDataFromCloud();
-                    this.showMainApp();
+                    
+                    // Call the app's auth handler
+                    if (window.onAuthStateChanged) {
+                        window.onAuthStateChanged(user);
+                    }
                 } else {
                     console.log('❌ User logged out');
-                    this.showAuthScreen();
+                    
+                    // Call the app's auth handler
+                    if (window.onAuthStateChanged) {
+                        window.onAuthStateChanged(null);
+                    }
                 }
             });
 
@@ -60,93 +68,29 @@ const FirebaseConfig = {
         }
     },
 
-    // ========== AUTHENTICATION ==========
-
-    async signup(email, password) {
-        try {
-            const { createUserWithEmailAndPassword } = window.firebaseAuth;
-            const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-            console.log('✅ User created:', userCredential.user.email);
-            
-            // Migrate local data to cloud after signup
-            await this.migrateLocalDataToCloud();
-            
-            return { success: true, user: userCredential.user };
-        } catch (error) {
-            console.error('❌ Signup error:', error);
-            return { success: false, error: error.message };
-        }
-    },
-
-    async login(email, password) {
-        try {
-            const { signInWithEmailAndPassword } = window.firebaseAuth;
-            const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-            console.log('✅ User logged in:', userCredential.user.email);
-            return { success: true, user: userCredential.user };
-        } catch (error) {
-            console.error('❌ Login error:', error);
-            return { success: false, error: error.message };
-        }
-    },
-
-    async loginWithGoogle() {
-        try {
-            const { GoogleAuthProvider, signInWithPopup } = window.firebaseAuth;
-            const provider = new GoogleAuthProvider();
-            const result = await signInWithPopup(this.auth, provider);
-            console.log('✅ User logged in with Google:', result.user.email);
-            
-            // Migrate local data to cloud after Google sign-in
-            await this.migrateLocalDataToCloud();
-            
-            return { success: true, user: result.user };
-        } catch (error) {
-            console.error('❌ Google login error:', error);
-            return { success: false, error: error.message };
-        }
-    },
-
-    async logout() {
-        try {
-            const { signOut } = window.firebaseAuth;
-            await signOut(this.auth);
-            console.log('✅ User logged out');
-            return { success: true };
-        } catch (error) {
-            console.error('❌ Logout error:', error);
-            return { success: false, error: error.message };
-        }
-    },
-
-    // ========== DATA SYNC ==========
+    // ========== CLOUD STORAGE ==========
 
     async saveToCloud(path, data) {
-        if (!this.currentUser) {
-            console.log('⚠️ No user logged in, saving to local only');
-            return false;
-        }
+        if (!this.currentUser) return;
+
+        const userId = this.currentUser.uid;
+        const userPath = `users/${userId}/${path}`;
 
         try {
-            const { ref, set } = window.firebaseDB;
-            const userPath = `users/${this.currentUser.uid}/${path}`;
             await set(ref(this.database, userPath), data);
             console.log(`✅ Saved to cloud: ${path}`);
-            return true;
         } catch (error) {
             console.error('❌ Cloud save error:', error);
-            return false;
         }
     },
 
     async getFromCloud(path) {
-        if (!this.currentUser) {
-            return null;
-        }
+        if (!this.currentUser) return null;
+
+        const userId = this.currentUser.uid;
+        const userPath = `users/${userId}/${path}`;
 
         try {
-            const { ref, get } = window.firebaseDB;
-            const userPath = `users/${this.currentUser.uid}/${path}`;
             const snapshot = await get(ref(this.database, userPath));
             
             if (snapshot.exists()) {
@@ -188,81 +132,8 @@ const FirebaseConfig = {
         } catch (error) {
             console.error('❌ Sync error:', error);
         }
-    },
-
-    async migrateLocalDataToCloud() {
-        if (!this.currentUser) return;
-
-        console.log('🔄 Migrating local data to cloud...');
-
-        try {
-            // Migrate papers
-            const papers = localStorage.getItem('papers');
-            if (papers) {
-                await this.saveToCloud('papers', JSON.parse(papers));
-            }
-
-            // Migrate folders
-            const folders = localStorage.getItem('folders');
-            if (folders) {
-                await this.saveToCloud('folders', JSON.parse(folders));
-            }
-
-            console.log('✅ Local data migrated to cloud');
-        } catch (error) {
-            console.error('❌ Migration error:', error);
-        }
-    },
-
-    // ========== UI MANAGEMENT ==========
-
-    showAuthScreen() {
-        const authScreen = document.getElementById('authScreen');
-        const mainContainer = document.querySelector('.container');
-        const userBar = document.getElementById('userBar');
-        
-        if (authScreen) {
-            authScreen.classList.add('show');
-            authScreen.style.display = 'flex';
-        }
-        if (mainContainer) {
-            mainContainer.style.display = 'none';
-        }
-        if (userBar) {
-            userBar.classList.remove('show');
-        }
-    },
-
-    showMainApp() {
-        const authScreen = document.getElementById('authScreen');
-        const mainContainer = document.querySelector('.container');
-        const userBar = document.getElementById('userBar');
-        
-        if (authScreen) {
-            authScreen.classList.remove('show');
-            authScreen.style.display = 'none';
-        }
-        if (mainContainer) {
-            mainContainer.style.display = 'block';
-        }
-        if (userBar) {
-            userBar.classList.add('show');
-        }
-
-        // Update user email display
-        const userEmailElement = document.getElementById('userEmail');
-        if (userEmailElement && this.currentUser) {
-            userEmailElement.textContent = this.currentUser.email;
-            
-            // Update avatar
-            const avatar = this.currentUser.email.charAt(0).toUpperCase();
-            const avatarElement = document.getElementById('userAvatar');
-            if (avatarElement) {
-                avatarElement.textContent = avatar;
-            }
-        }
     }
 };
 
-// Make available globally
+// Make FirebaseConfig available globally
 window.FirebaseConfig = FirebaseConfig;
