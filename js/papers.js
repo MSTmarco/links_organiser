@@ -5,12 +5,21 @@ const Papers = {
     currentPaperId: null,
     currentFilter: 'all',
     searchQuery: '',
+    initialized: false,
 
     // ========== INITIALIZATION ==========
 
     init() {
+        if (this.initialized) {
+            console.log('⚠️ Papers already initialized, skipping...');
+            this.render();
+            return;
+        }
+        
         this.setupEventListeners();
         this.render();
+        this.initialized = true;
+        console.log('✅ Papers initialized');
     },
 
     setupEventListeners() {
@@ -145,6 +154,9 @@ const Papers = {
         const modal = document.getElementById('paper-modal');
         const title = document.getElementById('paper-modal-title');
 
+        // Populate folder dropdown FIRST
+        this.populateFolderDropdown();
+
         if (paper) {
             title.textContent = 'Edit Paper';
             document.getElementById('paper-title').value = paper.title || '';
@@ -162,9 +174,6 @@ const Papers = {
             document.getElementById('paper-notes').value = '';
             document.getElementById('paper-tags').value = '';
         }
-
-        // Populate folder dropdown
-        this.populateFolderDropdown();
 
         modal.classList.add('show');
     },
