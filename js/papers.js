@@ -549,87 +549,89 @@ const Papers = {
         `;
     },
 
-    // ========== PAPER DETAIL VIEW ==========
+    // ========== FULL-SCREEN PAPER VIEW ==========
 
     openPaperDetail(paperId) {
         const paper = Storage.getPaperById(paperId);
         if (!paper) return;
 
-        const modal = document.getElementById('paper-detail-modal');
-        
         const folder = paper.folderId ? Storage.getFolderById(paper.folderId) : null;
         const folderBadge = folder ? 
-            `<span class="paper-folder-badge">${folder.icon} ${this.escapeHtml(folder.name)}</span>` : '';
+            `<span class="paper-folder-badge">${this.escapeHtml(folder.name)}</span>` : '';
 
         const tags = paper.tags && paper.tags.length > 0 ?
-            paper.tags.map(tag => `<span class="tag">${this.escapeHtml(tag)}</span>`).join('') : '<span class="text-secondary">No tags</span>';
+            paper.tags.map(tag => `<span class="paper-view-tag">${this.escapeHtml(tag)}</span>`).join('') : 
+            '<span class="paper-view-tag">No tags</span>';
 
         const priorityBadge = `<span class="priority-badge ${paper.priority}">${paper.priority || 'P2'}</span>`;
         const statusBadge = `<span class="status-badge ${paper.status?.toLowerCase().replace(' ', '-')}">${paper.status || 'To Read'}</span>`;
 
-        const detailHtml = `
-            <div class="paper-detail">
-                <div class="paper-detail-header">
-                    <h2>${this.escapeHtml(paper.title)}</h2>
-                    <div class="paper-detail-actions">
-                        <button class="btn btn-secondary" onclick="Papers.openPaperModal('${paper.id}')">
-                            ✏️ Edit
-                        </button>
-                        <button class="btn btn-danger" onclick="Papers.deletePaper('${paper.id}')">
-                            🗑️ Delete
-                        </button>
-                    </div>
+        // Create or get full-screen view container
+        let viewContainer = document.getElementById('paper-view-fullscreen');
+        if (!viewContainer) {
+            viewContainer = document.createElement('div');
+            viewContainer.id = 'paper-view-fullscreen';
+            viewContainer.className = 'paper-view-fullscreen';
+            document.body.appendChild(viewContainer);
+        }
+
+        viewContainer.innerHTML = `
+            <div class="paper-view-header">
+                <div class="paper-view-back" onclick="Papers.closePaperView()">
+                    Back to Papers
                 </div>
+                <div class="paper-view-actions">
+                    <button class="btn btn-secondary" onclick="Papers.openPaperModal('${paper.id}')">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger" onclick="Papers.deletePaper('${paper.id}')">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+            <div class="paper-view-content">
+                <h1 class="paper-view-title">${this.escapeHtml(paper.title)}</h1>
                 
-                <div class="paper-metadata">
+                <div class="paper-view-metadata">
                     ${priorityBadge}
                     ${statusBadge}
                     ${folderBadge}
-                </div>
-
-                <div class="paper-meta">
-                    ${paper.url ? `<a href="${this.escapeHtml(paper.url)}" target="_blank" class="paper-link" rel="noopener noreferrer">🔗 Open Paper</a>` : ''}
-                    <span class="paper-date">📅 Added: ${new Date(paper.createdAt).toLocaleDateString()}</span>
+                    ${paper.url ? `<a href="${this.escapeHtml(paper.url)}" target="_blank" class="paper-view-link" rel="noopener noreferrer">Open Paper</a>` : ''}
+                    <span class="paper-view-date">Added: ${new Date(paper.createdAt).toLocaleDateString()}</span>
                 </div>
 
                 ${paper.summary ? `
-                    <div class="paper-section">
-                        <h4>📝 Summary</h4>
-                        <p>${this.escapeHtml(paper.summary)}</p>
+                    <div class="paper-view-section">
+                        <h3 class="paper-view-section-title">Summary</h3>
+                        <div class="paper-view-section-content">${this.escapeHtml(paper.summary)}</div>
                     </div>
                 ` : ''}
 
                 ${paper.notes ? `
-                    <div class="paper-section">
-                        <h4>📋 Notes</h4>
-                        <p>${this.escapeHtml(paper.notes)}</p>
+                    <div class="paper-view-section">
+                        <h3 class="paper-view-section-title">Notes</h3>
+                        <div class="paper-view-section-content">${this.escapeHtml(paper.notes)}</div>
                     </div>
                 ` : ''}
 
-                <div class="paper-section">
-                    <h4>🏷️ Tags</h4>
-                    <div class="tags-container">${tags}</div>
+                <div class="paper-view-section">
+                    <h3 class="paper-view-section-title">Tags</h3>
+                    <div class="paper-view-tags">${tags}</div>
                 </div>
             </div>
         `;
 
-        document.getElementById('paper-detail-content').innerHTML = detailHtml;
-        modal.classList.add('active');
+        viewContainer.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    },
 
-        // Setup close listener
-        const closeBtn = document.getElementById('close-detail-modal');
-        const newCloseBtn = closeBtn.cloneNode(true);
-        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-        
-        newCloseBtn.addEventListener('click', () => {
-            modal.classList.remove('active');
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target.id === 'paper-detail-modal') {
-                modal.classList.remove('active');
-            }
-        });
+    closePaperView() {
+        const viewContainer = document.getElementById('paper-view-fullscreen');
+        if (viewContainer) {
+            viewContainer.classList.remove('active');
+        }
+        document.body.style.overflow = ''; // Restore scrolling
     },
 
     deletePaper(paperId) {
@@ -638,8 +640,8 @@ const Papers = {
             this.renderPapers();
             Folders.updateCounts();
             
-            const modal = document.getElementById('paper-detail-modal');
-            modal.classList.remove('active');
+            // Close full-screen view
+            this.closePaperView();
         }
     },
 
