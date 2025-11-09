@@ -56,10 +56,13 @@ const Folders = {
         const container = document.getElementById('folder-list');
         const folders = Storage.getFolders();
 
+        // SVG folder icon
+        const folderSvg = '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.75 3A1.75 1.75 0 0 0 0 4.75v7.5C0 13.216.784 14 1.75 14h12.5A1.75 1.75 0 0 0 16 12.25v-6.5A1.75 1.75 0 0 0 14.25 4H7.5a.25.25 0 0 1-.2-.1L6.07 2.09A1.75 1.75 0 0 0 4.671 1.5H1.75zM1.5 4.75a.25.25 0 0 1 .25-.25h2.921a.25.25 0 0 1 .2.1l1.232 1.81c.16.236.408.39.677.39h7.47a.25.25 0 0 1 .25.25v6.5a.25.25 0 0 1-.25.25H1.75a.25.25 0 0 1-.25-.25V4.75z"/></svg>';
+
         // Always start with "All Papers"
         let html = `
             <div class="folder-item ${this.currentFolderId === 'all' ? 'active' : ''}" data-folder-id="all">
-                <span class="folder-icon">📁</span>
+                <span class="folder-icon">${folderSvg}</span>
                 <span class="folder-name">All Papers</span>
                 <span class="paper-count">0</span>
             </div>
@@ -71,7 +74,7 @@ const Folders = {
                 <div class="folder-item ${this.currentFolderId === folder.id ? 'active' : ''}" 
                      data-folder-id="${folder.id}"
                      data-folder-name="${this.escapeHtml(folder.name)}">
-                    <span class="folder-icon">${folder.icon}</span>
+                    <span class="folder-icon">${folderSvg}</span>
                     <span class="folder-name">${this.escapeHtml(folder.name)}</span>
                     <span class="paper-count">0</span>
                 </div>
