@@ -137,19 +137,21 @@ const Folders = {
         document.getElementById('current-folder-title').textContent = folderName;
 
         // Update papers view
-        Papers.setFilter(folderId);
+        if (typeof Papers !== 'undefined' && Papers.renderPapers) {
+            Papers.renderPapers();
+        }
     },
 
     // ========== FOLDER MODAL ==========
 
     openFolderModal() {
         document.getElementById('folder-name').value = '';
-        document.getElementById('folder-icon').value = '📊';
-        document.getElementById('folder-modal').classList.add('show');
+        document.getElementById('folder-icon').value = '';
+        document.getElementById('folder-modal').classList.add('active');
     },
 
     closeFolderModal() {
-        document.getElementById('folder-modal').classList.remove('show');
+        document.getElementById('folder-modal').classList.remove('active');
     },
 
     saveFolder() {
