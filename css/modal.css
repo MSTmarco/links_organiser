@@ -11,7 +11,7 @@
     animation: fadeIn 0.2s ease;
 }
 
-.modal.show {
+.modal.active {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -40,7 +40,7 @@
 }
 
 .modal-large {
-    max-width: 700px;
+    max-width: 800px;
 }
 
 @keyframes slideUp {
@@ -101,6 +101,177 @@
     justify-content: flex-end;
 }
 
+/* ========== SEMANTIC SCHOLAR SEARCH STYLES ========== */
+
+.ss-loading,
+.ss-no-results,
+.ss-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.ss-error {
+    color: #dc3545;
+}
+
+.ss-result-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+}
+
+.ss-result-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.ss-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ss-result-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin: 0;
+    flex: 1;
+}
+
+.ss-add-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.ss-add-btn:hover {
+    background: #3a7bc8;
+    transform: scale(1.05);
+}
+
+.ss-add-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ss-result-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.ss-result-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ss-result-abstract {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========== PAPER DETAIL STYLES ========== */
+
+.paper-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.paper-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.paper-detail-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.paper-detail-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.paper-meta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.paper-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.paper-link:hover {
+    text-decoration: underline;
+}
+
+.paper-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.paper-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.paper-section p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.tags-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tags-container .tag {
+    font-size: 12px;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .modal-content {
@@ -113,5 +284,25 @@
     .modal-body,
     .modal-footer {
         padding: 16px;
+    }
+
+    .paper-detail-header {
+        flex-direction: column;
+    }
+
+    .paper-detail-actions {
+        width: 100%;
+    }
+
+    .paper-detail-actions .btn {
+        flex: 1;
+    }
+
+    .ss-result-header {
+        flex-direction: column;
+    }
+
+    .ss-add-btn {
+        width: 100%;
     }
 }
