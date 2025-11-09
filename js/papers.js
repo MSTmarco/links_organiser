@@ -201,6 +201,12 @@ const Papers = {
         const notes = document.getElementById('paper-notes').value.trim();
         const tagsString = document.getElementById('paper-tags').value.trim();
 
+        console.log('🔍 DEBUG savePaper:');
+        console.log('  - folderId from dropdown:', folderId);
+        console.log('  - folderId type:', typeof folderId);
+        console.log('  - folderId length:', folderId.length);
+        console.log('  - currentPaperId:', this.currentPaperId);
+
         if (!title) {
             alert('Please enter a title');
             return;
@@ -222,10 +228,17 @@ const Papers = {
             tags
         };
 
+        console.log('📦 paperData being saved:', paperData);
+
         if (this.currentPaperId) {
+            const existingPaper = Storage.getPaperById(this.currentPaperId);
+            console.log('📝 Updating existing paper:', existingPaper);
             Storage.updatePaper(this.currentPaperId, paperData);
+            const updatedPaper = Storage.getPaperById(this.currentPaperId);
+            console.log('✅ Paper after update:', updatedPaper);
         } else {
-            Storage.addPaper(paperData);
+            const newPaper = Storage.addPaper(paperData);
+            console.log('✅ New paper created:', newPaper);
         }
 
         this.closePaperModal();
