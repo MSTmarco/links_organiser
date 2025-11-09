@@ -479,7 +479,7 @@ const Papers = {
         } else {
             const folder = Storage.getFolderById(Folders.currentFolderId);
             if (folder) {
-                titleElement.textContent = `${folder.icon} ${folder.name}`;
+                titleElement.textContent = `${folder.name}`;
             }
         }
 
