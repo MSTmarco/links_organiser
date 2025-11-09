@@ -113,6 +113,21 @@ const Papers = {
         if (modal) {
             modal.classList.add('active');
             document.getElementById('ss-search-input').focus();
+            
+            // Show helpful message about CORS if it's the first time
+            const resultsContainer = document.getElementById('ss-results');
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                    <p style="margin-bottom: 16px;">💡 <strong>Note:</strong> Due to browser security (CORS), the Semantic Scholar API may not work directly from GitHub Pages.</p>
+                    <p style="margin-bottom: 16px;">If search doesn't work, you can:</p>
+                    <ol style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.8;">
+                        <li>Visit <a href="https://www.semanticscholar.org" target="_blank" style="color: var(--primary-color);">semanticscholar.org</a> to find papers</li>
+                        <li>Copy the paper URL</li>
+                        <li>Use the "+ New Paper" button to add it manually</li>
+                    </ol>
+                    <p style="margin-top: 20px; font-size: 14px;">Try searching anyway - it might work! 🚀</p>
+                </div>
+            `;
         }
     },
 
@@ -133,28 +148,74 @@ const Papers = {
         }
 
         const resultsContainer = document.getElementById('ss-results');
-        resultsContainer.innerHTML = '<div class="ss-loading">🔍 Searching Semantic Scholar...</div>';
+        resultsContainer.innerHTML = '<div class="ss-loading">🔍 Searching Semantic Scholar...<br><small>This may take a moment</small></div>';
 
         try {
-            // Search for papers
+            // Try direct API call first
             const searchUrl = `${this.SEMANTIC_SCHOLAR_API}/paper/search?query=${encodeURIComponent(query)}&limit=10&fields=paperId,title,abstract,authors,year,url,citationCount,publicationDate`;
             
-            const response = await fetch(searchUrl);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
+            const response = await fetch(searchUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
             if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
+                throw new Error(`API returned status ${response.status}`);
             }
 
             const data = await response.json();
             
             if (!data.data || data.data.length === 0) {
-                resultsContainer.innerHTML = '<div class="ss-no-results">No papers found. Try different keywords.</div>';
+                resultsContainer.innerHTML = '<div class="ss-no-results">📭 No papers found. Try different keywords or check spelling.</div>';
                 return;
             }
 
             this.renderSemanticScholarResults(data.data);
+            console.log('✅ Semantic Scholar search successful:', data.data.length, 'results');
+            
         } catch (error) {
             console.error('Semantic Scholar search error:', error);
-            resultsContainer.innerHTML = `<div class="ss-error">❌ Search failed: ${error.message}. Please try again.</div>`;
+            
+            // Provide helpful error message with workaround
+            let errorHtml = `
+                <div class="ss-error">
+                    <h3 style="margin-bottom: 16px;">❌ Search Not Available</h3>
+                    <p style="margin-bottom: 16px;">Due to browser security restrictions (CORS), we cannot directly access the Semantic Scholar API from GitHub Pages.</p>
+                    
+                    <div style="background: var(--bg-color); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                        <h4 style="margin-bottom: 12px;">✨ Workaround:</h4>
+                        <ol style="line-height: 1.8; padding-left: 20px;">
+                            <li><strong>Visit</strong> <a href="https://www.semanticscholar.org/search?q=${encodeURIComponent(query)}" target="_blank" style="color: var(--primary-color); font-weight: 600;">Semantic Scholar (opens in new tab)</a></li>
+                            <li><strong>Find</strong> the paper you want</li>
+                            <li><strong>Copy</strong> the paper's title and URL</li>
+                            <li><strong>Return here</strong> and click "+ New Paper"</li>
+                            <li><strong>Paste</strong> the information</li>
+                        </ol>
+                    </div>
+                    
+                    <div style="background: #e3f2fd; padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <strong>💡 Pro Tip:</strong> You can also paste any paper URL from arXiv, IEEE, ACM, or other sources!
+                    </div>
+                    
+                    <button 
+                        onclick="window.open('https://www.semanticscholar.org/search?q=${encodeURIComponent(query)}', '_blank')" 
+                        class="btn btn-primary" 
+                        style="margin-top: 20px; padding: 12px 24px;"
+                    >
+                        🔗 Search on Semantic Scholar Website
+                    </button>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = errorHtml;
         }
     },
 
@@ -207,7 +268,15 @@ const Papers = {
 
             // Fetch full paper details
             const url = `${this.SEMANTIC_SCHOLAR_API}/paper/${paperId}?fields=paperId,title,abstract,authors,year,url,citationCount,publicationDate,tldr`;
-            const response = await fetch(url);
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            const response = await fetch(url, {
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
             
             if (!response.ok) {
                 throw new Error(`Failed to fetch paper details: ${response.status}`);
@@ -244,13 +313,10 @@ const Papers = {
                 btn.textContent = originalText;
                 btn.disabled = false;
             }, 2000);
-
-            // Optionally close modal after adding
-            // this.closeSemanticScholarModal();
             
         } catch (error) {
             console.error('Error adding paper from Semantic Scholar:', error);
-            alert(`Failed to add paper: ${error.message}`);
+            alert(`Failed to add paper. You can add it manually using the "+ New Paper" button instead.`);
             
             const btn = document.querySelector(`[data-paper-id="${paperId}"]`);
             if (btn) {
@@ -476,8 +542,8 @@ const Papers = {
                 <div class="empty-icon">📄</div>
                 <h3>No papers yet</h3>
                 <p>Click "+ New Paper" to add your first research paper to ${folderName}</p>
-                <p style="margin-top: 10px; color: var(--primary-color); font-weight: 500;">
-                    Or try "🔍 Search Semantic Scholar" to find papers from the academic database!
+                <p style="margin-top: 10px; color: var(--text-secondary);">
+                    Or try the "🔍 Search Semantic Scholar" button to browse academic papers!
                 </p>
             </div>
         `;
