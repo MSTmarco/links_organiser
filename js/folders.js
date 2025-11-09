@@ -3,13 +3,23 @@
 
 const Folders = {
     currentFolderId: 'all',
+    initialized: false,
 
     // ========== INITIALIZATION ==========
 
     init() {
+        if (this.initialized) {
+            console.log('⚠️ Folders already initialized, skipping...');
+            this.render();
+            this.updateCounts();
+            return;
+        }
+        
         this.setupEventListeners();
         this.render();
         this.updateCounts();
+        this.initialized = true;
+        console.log('✅ Folders initialized');
     },
 
     setupEventListeners() {
