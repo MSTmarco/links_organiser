@@ -1,201 +1,205 @@
-/* ========== FULL-SCREEN PAPER VIEW ========== */
-/* Focus mode for reading papers */
-
-.paper-view-fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--bg-primary);
-    z-index: 9999;
-    display: none;
-    overflow-y: auto;
-}
-
-.paper-view-fullscreen.active {
-    display: block;
-}
-
-/* Header bar */
-.paper-view-header {
-    position: sticky;
-    top: 0;
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border-color);
-    padding: 14px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 10;
-}
-
-.paper-view-back {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    transition: all 0.15s ease;
-}
-
-.paper-view-back:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-
-.paper-view-back::before {
-    content: '←';
-    font-size: 18px;
-}
-
-.paper-view-actions {
-    display: flex;
-    gap: 8px;
-}
-
-/* Content area */
-.paper-view-content {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 32px 80px;
-}
-
-.paper-view-title {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.3;
-    margin-bottom: 24px;
-    letter-spacing: -0.02em;
-}
-
-.paper-view-metadata {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.paper-view-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    padding: 8px 16px;
-    background: var(--primary-light);
-    border-radius: var(--radius-sm);
-    transition: all 0.15s ease;
-}
-
-.paper-view-link:hover {
-    background: var(--primary-color);
-    color: white;
-}
-
-.paper-view-link::before {
-    content: '↗';
-    font-size: 14px;
-}
-
-.paper-view-date {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    padding: 8px 16px;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-sm);
-}
-
-/* Content sections */
-.paper-view-section {
-    margin-bottom: 40px;
-}
-
-.paper-view-section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 16px;
-}
-
-.paper-view-section-content {
-    font-size: 16px;
-    color: var(--text-primary);
-    line-height: 1.8;
-    white-space: pre-wrap;
-}
-
-/* Tags */
-.paper-view-tags {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.paper-view-tag {
-    padding: 6px 12px;
-    background: var(--bg-tertiary);
-    color: var(--text-secondary);
-    border-radius: var(--radius-sm);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* Edit mode overlay */
-.paper-edit-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.paper-edit-overlay.active {
-    display: flex;
-}
-
-.paper-edit-modal {
-    background: var(--bg-primary);
-    border-radius: var(--radius-lg);
-    width: 100%;
-    max-width: 700px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .paper-view-content {
-        padding: 24px 20px 60px;
-    }
-
-    .paper-view-title {
-        font-size: 24px;
-    }
-
-    .paper-view-section-content {
-        font-size: 15px;
-    }
-}
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/css/papers.css b/css/papers.css
+index 3e178c2f8d88046d7240495a650ce22fc21022fb..eaeecf54f74d93fc32cf473ca8108a6e55636fb2 100644
+--- a/css/papers.css
++++ b/css/papers.css
+@@ -1,92 +1,131 @@
+ /* ========== FULL-SCREEN PAPER VIEW ========== */
+ /* Focus mode for reading papers */
+ 
+ .paper-view-fullscreen {
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: var(--bg-primary);
+     z-index: 9999;
+     display: none;
+     overflow-y: auto;
+ }
+ 
+ .paper-view-fullscreen.active {
+     display: block;
+ }
+ 
++.main-app.paper-view-active .header,
++.main-app.paper-view-active .content {
++    display: none;
++}
++
++.main-app.paper-view-active .paper-view-fullscreen {
++    display: block;
++}
++
+ /* Header bar */
+ .paper-view-header {
+     position: sticky;
+     top: 0;
+     background: var(--bg-primary);
+     border-bottom: 1px solid var(--border-color);
+     padding: 14px 24px;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     z-index: 10;
+ }
+ 
++.paper-view-fullscreen.editing .paper-view-header {
++    border-bottom-color: var(--primary-color);
++    box-shadow: 0 8px 24px rgba(30, 64, 175, 0.12);
++}
++
+ .paper-view-back {
+     display: flex;
+     align-items: center;
+     gap: 8px;
+     color: var(--text-secondary);
+     font-size: 13px;
+     font-weight: 500;
+     cursor: pointer;
+     padding: 6px 12px;
+     border-radius: var(--radius-sm);
+     transition: all 0.15s ease;
+ }
+ 
+ .paper-view-back:hover {
+     background: var(--bg-secondary);
+     color: var(--text-primary);
+ }
+ 
+ .paper-view-back::before {
+     content: '←';
+     font-size: 18px;
+ }
+ 
+ .paper-view-actions {
+     display: flex;
+     gap: 8px;
+ }
+ 
++.paper-view-actions-group {
++    display: flex;
++    gap: 8px;
++}
++
++.paper-view-actions-group.edit-mode {
++    display: none;
++}
++
++.paper-view-header.editing .paper-view-actions-group.view-mode {
++    display: none;
++}
++
++.paper-view-header.editing .paper-view-actions-group.edit-mode {
++    display: flex;
++}
++
+ /* Content area */
+ .paper-view-content {
+     max-width: 800px;
+     margin: 0 auto;
+     padding: 40px 32px 80px;
+ }
+ 
++.paper-view-content.editing .paper-view-display {
++    display: none;
++}
++
++.paper-view-content.editing .paper-view-edit-form {
++    display: block;
++}
++
+ .paper-view-title {
+     font-size: 32px;
+     font-weight: 700;
+     color: var(--text-primary);
+     line-height: 1.3;
+     margin-bottom: 24px;
+     letter-spacing: -0.02em;
+ }
+ 
+ .paper-view-metadata {
+     display: flex;
+     gap: 12px;
+     flex-wrap: wrap;
+     margin-bottom: 32px;
+     padding-bottom: 24px;
+     border-bottom: 2px solid var(--border-color);
+ }
+ 
+ .paper-view-link {
+     display: inline-flex;
+     align-items: center;
+     gap: 6px;
+     color: var(--primary-color);
+     text-decoration: none;
+     font-weight: 500;
+@@ -133,50 +172,64 @@
+ }
+ 
+ .paper-view-section-content {
+     font-size: 16px;
+     color: var(--text-primary);
+     line-height: 1.8;
+     white-space: pre-wrap;
+ }
+ 
+ /* Tags */
+ .paper-view-tags {
+     display: flex;
+     gap: 8px;
+     flex-wrap: wrap;
+ }
+ 
+ .paper-view-tag {
+     padding: 6px 12px;
+     background: var(--bg-tertiary);
+     color: var(--text-secondary);
+     border-radius: var(--radius-sm);
+     font-size: 12px;
+     font-weight: 600;
+ }
+ 
++.paper-view-edit-form {
++    display: none;
++    margin-top: 32px;
++    background: var(--bg-secondary);
++    border-radius: var(--radius-lg);
++    border: 1px solid var(--border-color);
++    padding: 28px;
++    box-shadow: var(--shadow-md);
++}
++
++.paper-view-edit-form .form-group {
++    margin-bottom: 18px;
++}
++
+ /* Edit mode overlay */
+ .paper-edit-overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: rgba(0, 0, 0, 0.5);
+     z-index: 10000;
+     display: none;
+     align-items: center;
+     justify-content: center;
+     padding: 20px;
+ }
+ 
+ .paper-edit-overlay.active {
+     display: flex;
+ }
+ 
+ .paper-edit-modal {
+     background: var(--bg-primary);
+     border-radius: var(--radius-lg);
+     width: 100%;
+     max-width: 700px;
+     max-height: 90vh;
+ 
+EOF
+)
