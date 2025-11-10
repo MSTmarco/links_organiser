@@ -123,7 +123,7 @@ const FirebaseConfig = {
             }
 
             // Refresh UI
-            if (window.Papers) window.Papers.render();
+            if (window.Papers && window.Papers.renderPapers) window.Papers.renderPapers();
             if (window.Folders) {
                 window.Folders.render();
                 window.Folders.updateCounts();
