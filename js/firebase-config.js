@@ -3,7 +3,7 @@
 
 const FirebaseConfig = {
     config: {
-        apiKey: "AIzaSyDGScg87HkFvA4pWMvigdfRFp5GMUDQrPE",
+        apiKey: "",
         authDomain: "journal-74ede.firebaseapp.com",
         databaseURL: "https://journal-74ede-default-rtdb.firebaseio.com",
         projectId: "journal-74ede",
