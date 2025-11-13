@@ -15,6 +15,12 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Export auth and db
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Export auth and db globally
+window.auth = firebase.auth();
+window.db = firebase.firestore();
+
+// Also export as FirebaseConfig if needed by app.js
+window.FirebaseConfig = {
+    auth: window.auth,
+    db: window.db
+};
