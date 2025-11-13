@@ -1,122 +1,76 @@
-/* ========== ENGAGING PAPER CARDS ========== */
-/* Inspired by Goodreads, Kindle, Apple Books */
-
-.paper-card {
-    background: var(--bg-primary);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    box-shadow: var(--shadow-md);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ========== FOLDER ITEMS ========== */
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
     cursor: pointer;
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    position: relative;
-    overflow: hidden;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
-.paper-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+.folder-item:hover {
+    background: var(--bg-color);
 }
 
-.paper-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary-light);
+.folder-item.active {
+    background: rgba(74, 144, 226, 0.1);
+    border-left-color: var(--primary-color);
 }
 
-.paper-card:hover::before {
-    opacity: 1;
+.folder-icon {
+    font-size: 20px;
 }
 
-/* ========== PAPER METADATA ========== */
-.paper-metadata {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 4px;
+.folder-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text-primary);
 }
 
-/* Priority badges - colorful and prominent */
-.priority-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    border-radius: var(--radius-full);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    box-shadow: var(--shadow-sm);
-}
-
-.priority-badge.P1 {
-    background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
-    color: white;
-}
-
-.priority-badge.P2 {
-    background: linear-gradient(135deg, var(--warning-color) 0%, #d97706 100%);
-    color: white;
-}
-
-.priority-badge.P3 {
-    background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
-    color: white;
-}
-
-/* Status badges - elegant and clear */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    border-radius: var(--radius-full);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
-.status-badge.to-read {
-    background: var(--primary-light);
-    color: var(--primary-color);
-    border: 1.5px solid var(--primary-color);
-}
-
-.status-badge.reading {
-    background: var(--warning-light);
-    color: var(--warning-color);
-    border: 1.5px solid var(--warning-color);
-}
-
-.status-badge.read {
-    background: var(--success-light);
-    color: var(--success-color);
-    border: 1.5px solid var(--success-color);
-}
-
-.paper-folder-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-md);
-    font-size: 12px;
+.paper-count {
+    background: var(--bg-color);
     color: var(--text-secondary);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
     font-weight: 600;
 }
 
-/* ========== PAPER TITLE ========== */
+.folder-item.active .paper-count {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* ========== PAPERS GRID ========== */
+.papers-grid {
+    padding: 24px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    align-content: start;
+}
+
+/* ========== PAPER CARD ========== */
+.paper-card {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.paper-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 .paper-card-header {
     display: flex;
     justify-content: space-between;
@@ -125,54 +79,51 @@
 }
 
 .paper-title {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     color: var(--text-primary);
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
 }
 
-/* ========== PAPER SUMMARY ========== */
+.paper-folder-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--bg-color);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
 .paper-summary {
     font-size: 14px;
     color: var(--text-secondary);
-    line-height: 1.7;
+    line-height: 1.5;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* ========== PAPER FOOTER ========== */
 .paper-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 16px;
-    border-top: 2px solid var(--bg-tertiary);
-    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
 }
 
 .paper-date {
     font-size: 12px;
-    color: var(--text-tertiary);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    color: var(--text-secondary);
 }
 
-.paper-date::before {
-    content: '📅';
-    font-size: 14px;
-}
-
-/* ========== PAPER TAGS ========== */
 .paper-tags {
     display: flex;
     gap: 6px;
@@ -181,91 +132,24 @@
 
 .tag {
     display: inline-block;
-    padding: 5px 12px;
-    background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-light) 100%);
+    padding: 4px 8px;
+    background: rgba(74, 144, 226, 0.1);
     color: var(--primary-color);
-    border-radius: var(--radius-full);
+    border-radius: 4px;
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.tag:hover {
-    background: var(--primary-color);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+    font-weight: 500;
 }
 
 /* ========== PAPER DETAIL VIEW ========== */
 .paper-detail {
     display: flex;
     flex-direction: column;
-    gap: 28px;
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.paper-detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.paper-detail.editing .paper-detail-header {
-    border-bottom-color: var(--primary-color);
-}
-
-.paper-detail-header h2 {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.3;
-    letter-spacing: -0.03em;
-}
-
-.paper-detail-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-.paper-detail-actions .view-actions,
-.paper-detail-actions .edit-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.paper-detail-actions .edit-actions {
-    display: none;
-}
-
-.paper-detail.editing .paper-detail-actions .view-actions {
-    display: none;
-}
-
-.paper-detail.editing .paper-detail-actions .edit-actions {
-    display: flex;
+    gap: 24px;
 }
 
 .paper-meta {
     display: flex;
-    gap: 20px;
+    gap: 16px;
     align-items: center;
     flex-wrap: wrap;
 }
@@ -273,158 +157,59 @@
 .paper-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    padding: 10px 18px;
-    background: var(--primary-light);
-    border-radius: var(--radius-md);
-    transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .paper-link:hover {
-    background: var(--primary-color);
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.paper-link::before {
-    content: '↗';
-    font-size: 16px;
+    text-decoration: underline;
 }
 
 .paper-section {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 20px;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    border-left: 4px solid var(--primary-color);
+    gap: 12px;
 }
 
 .paper-section h4 {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .paper-section p {
-    font-size: 15px;
-    color: var(--text-primary);
-    line-height: 1.8;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
     white-space: pre-wrap;
 }
 
 .tags-container {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .tags-container .tag {
     font-size: 12px;
-    padding: 6px 14px;
 }
 
-.paper-detail-view {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.paper-detail-edit {
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-    padding: 24px;
-}
-
-.paper-detail.editing .paper-detail-view {
-    display: none;
-}
-
-.paper-detail.editing .paper-detail-edit {
-    display: flex;
-    box-shadow: var(--shadow-sm);
-    border-color: var(--primary-light);
-}
-
-.paper-detail-edit .form-group {
-    margin-bottom: 16px;
-}
-
-.paper-detail-edit .form-group:last-child {
-    margin-bottom: 0;
-}
-
-/* ========== READING PROGRESS (Future feature) ========== */
-.reading-progress {
-    height: 6px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-    margin-top: 12px;
-}
-
-.reading-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-color) 0%, var(--accent-color) 100%);
-    transition: width 0.3s ease;
-    border-radius: var(--radius-full);
+/* ========== NO PAPERS STATE ========== */
+.papers-grid .empty-state {
+    grid-column: 1 / -1;
 }
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
+    .papers-grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
     .paper-card {
-        padding: 20px;
-    }
-
-    .paper-title {
-        font-size: 16px;
-    }
-
-    .paper-detail-header {
-        flex-direction: column;
-    }
-
-    .paper-detail-actions {
-        width: 100%;
-    }
-
-    .paper-detail-actions .btn {
-        flex: 1;
+        padding: 16px;
     }
 }
-
-/* ========== HOVER EFFECTS FOR ENGAGEMENT ========== */
-.paper-card {
-    animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Stagger animation for multiple cards */
-.paper-card:nth-child(1) { animation-delay: 0.05s; }
-.paper-card:nth-child(2) { animation-delay: 0.1s; }
-.paper-card:nth-child(3) { animation-delay: 0.15s; }
-.paper-card:nth-child(4) { animation-delay: 0.2s; }
-.paper-card:nth-child(5) { animation-delay: 0.25s; }
-.paper-card:nth-child(6) { animation-delay: 0.3s; }

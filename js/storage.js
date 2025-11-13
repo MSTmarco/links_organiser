@@ -164,11 +164,6 @@ const Storage = {
 
         try {
             const userId = FirebaseConfig.currentUser.uid;
-            console.log('🔄 Syncing data for user:', userId);
-
-            // CRITICAL: Clear localStorage first to prevent showing other user's data
-            localStorage.removeItem(this.PAPERS_KEY);
-            localStorage.removeItem(this.FOLDERS_KEY);
 
             // Get papers
             const papersSnapshot = await window.firebaseDB.get(
@@ -178,11 +173,6 @@ const Storage = {
             if (papersSnapshot.exists()) {
                 const papers = papersSnapshot.val();
                 localStorage.setItem(this.PAPERS_KEY, JSON.stringify(papers));
-                console.log('✅ Synced papers from cloud:', papers.length);
-            } else {
-                // New user - initialize empty arrays
-                localStorage.setItem(this.PAPERS_KEY, JSON.stringify([]));
-                console.log('📝 New user - initialized empty papers');
             }
 
             // Get folders
@@ -193,13 +183,9 @@ const Storage = {
             if (foldersSnapshot.exists()) {
                 const folders = foldersSnapshot.val();
                 localStorage.setItem(this.FOLDERS_KEY, JSON.stringify(folders));
-                console.log('✅ Synced folders from cloud:', folders.length);
-            } else {
-                // New user - initialize empty arrays
-                localStorage.setItem(this.FOLDERS_KEY, JSON.stringify([]));
-                console.log('📝 New user - initialized empty folders');
             }
 
+            console.log('✅ Data synced from cloud');
         } catch (error) {
             console.error('❌ Sync from cloud failed:', error);
         }
@@ -244,12 +230,6 @@ const Storage = {
     },
 
     // ========== CLEAR DATA ==========
-
-    clearLocalData() {
-        localStorage.removeItem(this.PAPERS_KEY);
-        localStorage.removeItem(this.FOLDERS_KEY);
-        console.log('🗑️ Cleared local data');
-    },
 
     clearAllData() {
         if (confirm('Are you sure you want to delete all papers and folders? This cannot be undone.')) {

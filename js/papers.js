@@ -5,21 +5,12 @@ const Papers = {
     currentPaperId: null,
     currentFilter: 'all',
     searchQuery: '',
-    initialized: false,
 
     // ========== INITIALIZATION ==========
 
     init() {
-        if (this.initialized) {
-            console.log('⚠️ Papers already initialized, skipping...');
-            this.render();
-            return;
-        }
-        
         this.setupEventListeners();
         this.render();
-        this.initialized = true;
-        console.log('✅ Papers initialized');
     },
 
     setupEventListeners() {
@@ -154,9 +145,6 @@ const Papers = {
         const modal = document.getElementById('paper-modal');
         const title = document.getElementById('paper-modal-title');
 
-        // Populate folder dropdown FIRST
-        this.populateFolderDropdown();
-
         if (paper) {
             title.textContent = 'Edit Paper';
             document.getElementById('paper-title').value = paper.title || '';
@@ -174,6 +162,9 @@ const Papers = {
             document.getElementById('paper-notes').value = '';
             document.getElementById('paper-tags').value = '';
         }
+
+        // Populate folder dropdown
+        this.populateFolderDropdown();
 
         modal.classList.add('show');
     },
@@ -201,12 +192,6 @@ const Papers = {
         const notes = document.getElementById('paper-notes').value.trim();
         const tagsString = document.getElementById('paper-tags').value.trim();
 
-        console.log('🔍 DEBUG savePaper:');
-        console.log('  - folderId from dropdown:', folderId);
-        console.log('  - folderId type:', typeof folderId);
-        console.log('  - folderId length:', folderId.length);
-        console.log('  - currentPaperId:', this.currentPaperId);
-
         if (!title) {
             alert('Please enter a title');
             return;
@@ -228,17 +213,10 @@ const Papers = {
             tags
         };
 
-        console.log('📦 paperData being saved:', paperData);
-
         if (this.currentPaperId) {
-            const existingPaper = Storage.getPaperById(this.currentPaperId);
-            console.log('📝 Updating existing paper:', existingPaper);
             Storage.updatePaper(this.currentPaperId, paperData);
-            const updatedPaper = Storage.getPaperById(this.currentPaperId);
-            console.log('✅ Paper after update:', updatedPaper);
         } else {
-            const newPaper = Storage.addPaper(paperData);
-            console.log('✅ New paper created:', newPaper);
+            Storage.addPaper(paperData);
         }
 
         this.closePaperModal();

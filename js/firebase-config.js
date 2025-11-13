@@ -3,7 +3,7 @@
 
 const FirebaseConfig = {
     config: {
-        apiKey: "",
+        apiKey: "AIzaSyDGScg87HkFvA4pWMvigdfRFp5GMUDQrPE",
         authDomain: "journal-74ede.firebaseapp.com",
         databaseURL: "https://journal-74ede-default-rtdb.firebaseio.com",
         projectId: "journal-74ede",
@@ -45,18 +45,10 @@ const FirebaseConfig = {
                 if (user) {
                     console.log('✅ User logged in:', user.email);
                     this.syncDataFromCloud();
-                    
-                    // Call the app's auth handler
-                    if (window.onAuthStateChanged) {
-                        window.onAuthStateChanged(user);
-                    }
+                    this.showMainApp();
                 } else {
                     console.log('❌ User logged out');
-                    
-                    // Call the app's auth handler
-                    if (window.onAuthStateChanged) {
-                        window.onAuthStateChanged(null);
-                    }
+                    this.showAuthScreen();
                 }
             });
 
@@ -68,29 +60,93 @@ const FirebaseConfig = {
         }
     },
 
-    // ========== CLOUD STORAGE ==========
+    // ========== AUTHENTICATION ==========
+
+    async signup(email, password) {
+        try {
+            const { createUserWithEmailAndPassword } = window.firebaseAuth;
+            const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+            console.log('✅ User created:', userCredential.user.email);
+            
+            // Migrate local data to cloud after signup
+            await this.migrateLocalDataToCloud();
+            
+            return { success: true, user: userCredential.user };
+        } catch (error) {
+            console.error('❌ Signup error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async login(email, password) {
+        try {
+            const { signInWithEmailAndPassword } = window.firebaseAuth;
+            const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+            console.log('✅ User logged in:', userCredential.user.email);
+            return { success: true, user: userCredential.user };
+        } catch (error) {
+            console.error('❌ Login error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async loginWithGoogle() {
+        try {
+            const { GoogleAuthProvider, signInWithPopup } = window.firebaseAuth;
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(this.auth, provider);
+            console.log('✅ User logged in with Google:', result.user.email);
+            
+            // Migrate local data to cloud after Google sign-in
+            await this.migrateLocalDataToCloud();
+            
+            return { success: true, user: result.user };
+        } catch (error) {
+            console.error('❌ Google login error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async logout() {
+        try {
+            const { signOut } = window.firebaseAuth;
+            await signOut(this.auth);
+            console.log('✅ User logged out');
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Logout error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    // ========== DATA SYNC ==========
 
     async saveToCloud(path, data) {
-        if (!this.currentUser) return;
-
-        const userId = this.currentUser.uid;
-        const userPath = `users/${userId}/${path}`;
+        if (!this.currentUser) {
+            console.log('⚠️ No user logged in, saving to local only');
+            return false;
+        }
 
         try {
+            const { ref, set } = window.firebaseDB;
+            const userPath = `users/${this.currentUser.uid}/${path}`;
             await set(ref(this.database, userPath), data);
             console.log(`✅ Saved to cloud: ${path}`);
+            return true;
         } catch (error) {
             console.error('❌ Cloud save error:', error);
+            return false;
         }
     },
 
     async getFromCloud(path) {
-        if (!this.currentUser) return null;
-
-        const userId = this.currentUser.uid;
-        const userPath = `users/${userId}/${path}`;
+        if (!this.currentUser) {
+            return null;
+        }
 
         try {
+            const { ref, get } = window.firebaseDB;
+            const userPath = `users/${this.currentUser.uid}/${path}`;
             const snapshot = await get(ref(this.database, userPath));
             
             if (snapshot.exists()) {
@@ -108,32 +164,106 @@ const FirebaseConfig = {
         if (!this.currentUser) return;
 
         try {
-            // Get papers
-            const papers = await this.getFromCloud('papers');
-            if (papers) {
-                localStorage.setItem('papers', JSON.stringify(papers));
-                console.log('✅ Synced papers from cloud');
+            // Get journal entries
+            const entries = await this.getFromCloud('journal/entries');
+            if (entries) {
+                localStorage.setItem('journal_entries', JSON.stringify(entries));
+                console.log('✅ Synced journal entries from cloud');
             }
 
-            // Get folders
-            const folders = await this.getFromCloud('folders');
-            if (folders) {
-                localStorage.setItem('folders', JSON.stringify(folders));
-                console.log('✅ Synced folders from cloud');
+            // Get projects
+            const projects = await this.getFromCloud('projects/projects');
+            if (projects) {
+                localStorage.setItem('projects', JSON.stringify(projects));
+                console.log('✅ Synced projects from cloud');
             }
 
             // Refresh UI
-            if (window.Papers && window.Papers.renderPapers) window.Papers.renderPapers();
-            if (window.Folders) {
-                window.Folders.render();
-                window.Folders.updateCounts();
+            if (window.Journal) window.Journal.updateStats();
+            if (window.Projects) {
+                window.Projects.updateStats();
+                window.Projects.loadProjects();
             }
+            if (window.Calendar) window.Calendar.update();
 
         } catch (error) {
             console.error('❌ Sync error:', error);
         }
+    },
+
+    async migrateLocalDataToCloud() {
+        if (!this.currentUser) return;
+
+        console.log('🔄 Migrating local data to cloud...');
+
+        try {
+            // Migrate journal entries
+            const entries = localStorage.getItem('journal_entries');
+            if (entries) {
+                await this.saveToCloud('journal/entries', JSON.parse(entries));
+            }
+
+            // Migrate projects
+            const projects = localStorage.getItem('projects');
+            if (projects) {
+                await this.saveToCloud('projects/projects', JSON.parse(projects));
+            }
+
+            console.log('✅ Local data migrated to cloud');
+        } catch (error) {
+            console.error('❌ Migration error:', error);
+        }
+    },
+
+    // ========== UI MANAGEMENT ==========
+
+    showAuthScreen() {
+        const authScreen = document.getElementById('authScreen');
+        const mainContainer = document.querySelector('.container');
+        const userBar = document.getElementById('userBar');
+        
+        if (authScreen) {
+            authScreen.classList.add('show');
+            authScreen.style.display = 'flex';
+        }
+        if (mainContainer) {
+            mainContainer.style.display = 'none';
+        }
+        if (userBar) {
+            userBar.classList.remove('show');
+        }
+    },
+
+    showMainApp() {
+        const authScreen = document.getElementById('authScreen');
+        const mainContainer = document.querySelector('.container');
+        const userBar = document.getElementById('userBar');
+        
+        if (authScreen) {
+            authScreen.classList.remove('show');
+            authScreen.style.display = 'none';
+        }
+        if (mainContainer) {
+            mainContainer.style.display = 'block';
+        }
+        if (userBar) {
+            userBar.classList.add('show');
+        }
+
+        // Update user email display
+        const userEmailElement = document.getElementById('userEmail');
+        if (userEmailElement && this.currentUser) {
+            userEmailElement.textContent = this.currentUser.email;
+            
+            // Update avatar
+            const avatar = this.currentUser.email.charAt(0).toUpperCase();
+            const avatarElement = document.getElementById('userAvatar');
+            if (avatarElement) {
+                avatarElement.textContent = avatar;
+            }
+        }
     }
 };
 
-// Make FirebaseConfig available globally
+// Make available globally
 window.FirebaseConfig = FirebaseConfig;
